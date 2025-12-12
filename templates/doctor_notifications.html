@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="row">
+    <!-- Sidebar -->
+    <div class="col-md-3">
+      {% include "doctor_sidebar.html" %}
+    </div>
+
+    <!-- Main content -->
+    <div class="col-md-9">
+      <div class="card shadow-sm p-4">
+        <h4 class="mb-3 text-primary">Notifications</h4>
+
+        <h5 class="text-secondary">Unread Messages</h5>
+        {% if unread_messages %}
+          <ul class="list-group mb-4">
+            {% for m in unread_messages %}
+              <li class="list-group-item">
+                <strong>{{ m.sender_name }}</strong>: {{ m.content }}
+                <br><small class="text-muted">{{ m.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="alert alert-info">No unread messages.</div>
+        {% endif %}
+
+        <h5 class="text-secondary mt-4">Pending Appointments</h5>
+        {% if pending_appointments %}
+          <ul class="list-group">
+            {% for p in pending_appointments %}
+              <li class="list-group-item">
+                Appointment with <strong>{{ p.patient_name }}</strong> on 
+                <strong>{{ p.date }}</strong> at <strong>{{ p.time }}</strong>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="alert alert-info">No pending appointments.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

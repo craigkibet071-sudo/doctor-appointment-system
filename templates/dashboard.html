@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | Digital Healthcare</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background: #007bff;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            margin: 0;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .card {
+            width: 300px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .card h3 {
+            color: #333;
+        }
+        .card a {
+            display: inline-block;
+            margin-top: 10px;
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .card a:hover {
+            background: #0056b3;
+        }
+        .logout {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .logout a {
+            background: #dc3545;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .logout a:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Welcome, {{ user.name }}</h1>
+        <p>Your Digital Healthcare Dashboard</p>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h3>Book an Appointment</h3>
+            <a href="{{ url_for('book_appointment') }}">Book Now</a>
+        </div>
+
+        <div class="card">
+            <h3>View My Appointments</h3>
+            <a href="{{ url_for('view_appointments') }}">View</a>
+        </div>
+    </div>
+
+    <div class="logout">
+        <a href="{{ url_for('logout') }}">Logout</a>
+

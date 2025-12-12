@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Appointment Confirmed | Digital Healthcare</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #eaf4fc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .confirmation-box {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+            text-align: center;
+            max-width: 450px;
+        }
+        h2 {
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+            font-size: 15px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-box">
+        <h2>✅ Appointment Confirmed</h2>
+        <p>Thank you, <strong>{{ patient_name }}</strong>!</p>
+        <p>Your appointment with <strong>{{ doctor_name }}</strong><br>
+           is scheduled for <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.</p>
+        <p>Status: <strong>Pending approval</strong></p>
+
+        <button>
+            <a href="{{ url_for('patient_dashboard') }}">Return to Dashboard</a>
+        </button>
+    </div>
+</body>
+</html>

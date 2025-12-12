@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <h3>Dr. {{ doctor.name }} - Manage Availability</h3>
+
+    <!-- Add Availability Form -->
+    <form action="{{ url_for('doctor_add_availability') }}" method="POST">
+        <input type="date" name="date" required>
+        <input type="time" name="start_time" required>
+        <input type="time" name="end_time" required>
+        <textarea name="notes" placeholder="Notes (optional)"></textarea>
+        <button type="submit">Add Slot</button>
+    </form>
+
+    <!-- Table of Slots -->
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Duration (minutes)</th>
+                <th>Notes</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for slot in availability %}
+            <tr>
+                <td>{{ slot.date }}</td>
+                <td>{{ slot.start_time }}</td>
+                <td>{{ slot.end_time }}</td>
+                <td>
+                    {% set duration = ((slot.end_time|datetime('%H:%M') - slot.start_time|datetime('%H:%M')).seconds // 60) %}
+                    {{ duration }}
+                </td>
+                <td>{{ slot.notes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,63 @@
+<style>
+    .reschedule-container {
+        width: 350px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+
+    .reschedule-container h2 {
+        text-align: center;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .reschedule-container label {
+        display: block;
+        margin-bottom: 6px;
+        color: #444;
+        font-weight: bold;
+    }
+
+    .reschedule-container input[type="date"],
+    .reschedule-container input[type="time"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 15px;
+    }
+
+    .reschedule-container button {
+        width: 100%;
+        padding: 10px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    .reschedule-container button:hover {
+        background: #0056b3;
+    }
+</style>
+
+<div class="reschedule-container">
+    <h2>Reschedule Appointment</h2>
+
+    <form method="POST">
+        <label>New Date:</label>
+        <input type="date" name="date" required>
+
+        <label>New Time:</label>
+        <input type="time" name="time" required>
+
+        <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+</div>

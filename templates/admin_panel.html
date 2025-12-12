@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel | Proactive Healthcare</title>
+        <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #0078d7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('create_user') }}" class="btn">+ Create New User</a>
+    <div class="container" style="width: 700px;">
+        <h2>Admin Dashboard</h2>
+        <p>All registered users:</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>User ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user._id }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <br>
+        <a href="/dashboard">⬅ Back to Dashboard</a><br>
+        <a href="/logout">Logout</a>
+    </div>
+</body>
+</html>

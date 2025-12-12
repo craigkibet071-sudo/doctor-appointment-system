@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Messages | {{ doctor.name }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+  <style>
+    body {
+      background: url("/static/images/Medical technology science background vector in.jpeg") no-repeat center center/cover;
+      height: 100vh;
+      color: #fff;
+      display: flex;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .sidebar {
+      width: 230px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .chat-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      width: fit-content;
+      max-width: 70%;
+    }
+
+    .sent {
+      background: rgba(0, 128, 255, 0.8);
+      color: #fff;
+      margin-left: auto;
+    }
+
+    .received {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      margin-right: auto;
+    }
+
+    form select, form textarea, form button {
+      margin-top: 8px;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <h4>{{ doctor.name }}</h4>
+      <p><small>{{ doctor.email }}</small></p>
+      <hr>
+      <a href="{{ url_for('doctor_dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('doctor_messages') }}">💬 Messages</a>
+      <a href="#">📅 Calendar</a>
+      <a href="#">🔔 Notifications</a>
+      <a href="#">👤 Edit Profile</a>
+    </div>
+    <div>
+      <a href="{{ url_for('logout') }}" class="btn btn-danger w-100">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>💬 Messages</h2>
+
+    <!-- Chat box -->
+    <div class="chat-box">
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="message {% if msg.sender_id|string == doctor._id|string %}sent{% else %}received{% endif %}">
+            <strong>{{ msg.sender_name }}:</strong> {{ msg.content }}
+            <br>
+            <small><em>{{ msg.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</em></small>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No messages yet. Start a conversation below.</p>
+      {% endif %}
+    </div>
+
+    <!-- Message form -->
+    <form method="POST" action="{{ url_for('send_message') }}">
+      <div class="row">
+        <div class="col-md-4">
+          <select class="form-select" name="receiver_id" required>
+            <option value="">Select Patient</option>
+            {% for user in patients %}
+              <option value="{{ user._id }}">{{ user.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-6">
+          <textarea class="form-control" name="content" placeholder="Type your message..." required></textarea>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-primary w-100">Send</button>
+        </div>
+      </div>
+    </form>
+
+    <footer>
+      <p>© 2025 Doctor Messaging System | Healthcare Portal</p>
+    </footer>
+  </div>
+</body>
+</html>

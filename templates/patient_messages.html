@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Messages | {{ patient.name }}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+  <style>
+    body {
+      background: url("/static/images/Medical technology science background vector in.jpeg") no-repeat center center/cover;
+      height: 100vh;
+      color: #fff;
+      display: flex;
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .sidebar {
+      width: 230px;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(6px);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar a {
+      color: #fff;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 6px;
+      display: block;
+      margin-bottom: 10px;
+      transition: background 0.3s ease;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 25px;
+      overflow-y: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .chat-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    .message {
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      width: fit-content;
+      max-width: 70%;
+    }
+
+    .sent {
+      background: rgba(0, 128, 255, 0.8);
+      color: #fff;
+      margin-left: auto;
+    }
+
+    .received {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+      margin-right: auto;
+    }
+
+    form select, form textarea, form button {
+      margin-top: 8px;
+    }
+
+    textarea {
+      resize: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .alert {
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div>
+      <h4>{{ patient.name }}</h4>
+      <p><small>{{ patient.email }}</small></p>
+      <hr>
+      <a href="{{ url_for('patient_dashboard') }}">🏠 Dashboard</a>
+      <a href="{{ url_for('patient_messages') }}">💬 Messages</a>
+      <a href="#">📅 Appointments (coming soon)</a>
+      <a href="#">👤 Edit Profile</a>
+    </div>
+    <div>
+      <a href="{{ url_for('logout') }}" class="btn btn-danger w-100">Logout</a>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h2>💬 Messages</h2>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Chat box -->
+    <div class="chat-box" id="chatBox">
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="message {% if msg.sender_id == patient._id|string %}sent{% else %}received{% endif %}">
+            <strong>{{ msg.sender_name }}:</strong> {{ msg.content }}
+            <br>
+            <small><em>{{ msg.timestamp.strftime("%Y-%m-%d %H:%M:%S") }}</em></small>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No messages yet. Start a conversation below.</p>
+      {% endif %}
+    </div>
+
+    <!-- Message form -->
+    <form method="POST" action="{{ url_for('send_patient_message') }}">
+      <div class="form-group">
+        <label for="receiver_id">Select Doctor:</label>
+        <select name="receiver_id" id="receiver_id" class="form-control" required>
+          <option value="">-- Choose Doctor --</option>
+          {% for doctor in doctors %}
+            <option value="{{ doctor._id|string }}">{{ doctor.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="content">Message:</label>
+        <textarea name="content" id="content" class="form-control" rows="3" required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-2">Send</button>
+    </form>
+
+    <footer>
+      <p>© 2025 Patient Messaging System | Healthcare Portal</p>
+    </footer>
+  </div>
+
+  <!-- Auto-scroll to bottom -->
+  <script>
+    const chatBox = document.getElementById("chatBox");
+    if (chatBox) {
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

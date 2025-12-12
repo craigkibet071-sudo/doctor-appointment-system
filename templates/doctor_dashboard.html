@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Doctor Dashboard</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+  <style>
+    body {
+      background: url("/static/images/medic.jpeg") no-repeat center center/cover;
+      background-attachment: fixed;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+      margin: 0;
+    }
+    .layout { display: flex; height: 100vh; }
+    .sidebar {
+      width: 260px;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
+      flex-shrink: 0;
+      position: fixed;
+      height: 100%;
+      top: 0;
+      left: 0;
+      overflow-y: auto;
+      padding-top: 20px;
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+    }
+    .doctor-info { text-align: center; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.2); }
+    .doctor-info img { width: 90px; height: 90px; border-radius: 50%; border: 3px solid #00bcd4; margin-bottom: 10px; object-fit: cover; }
+    .menu a {
+      display: block;
+      padding: 12px 25px;
+      color: #ddd;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+    .menu a:hover, .menu a.active {
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      padding-left: 30px;
+    }
+    .topbar {
+      width: 100%;
+      height: 65px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      color: #fff;
+      position: fixed;
+      left: 260px;
+      top: 0;
+      padding: 15px 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 900;
+    }
+    .main-content {
+      margin-left: 260px;
+      margin-top: 80px;
+      padding: 30px;
+      width: calc(100% - 260px);
+      overflow-y: auto;
+      height: calc(100vh - 80px);
+    }
+    section { display: none; }
+    section.active { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+    #doctorCalendar { background: rgba(255,255,255,0.15); padding: 20px; border-radius: 10px; color: black; min-height:600px; }
+    table th, table td { color: #fff; }
+  </style>
+</head>
+
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="doctor-info">
+      <img src="{{ doctor.photo or '/static/images/This AI art piece features a compassionate Black.jpg' }}" alt="Doctor Photo">
+      <h5>{{ doctor.name }}</h5>
+      <p>{{ doctor.specialty or 'General Practitioner' }}</p>
+    </div>
+
+    <div class="menu">
+      <a class="active" data-section="dashboard">🏠 Dashboard</a>
+      <a href="{{ url_for('doctor_messages') }}">💬 Messages</a>
+      <a data-section="calendar">📅 Calendar</a>
+      <a data-section="availability">➕ Add Availability</a>
+      <a data-section="notifications">🔔 Notifications</a>
+      <a data-section="profile">⚙️ Edit Profile</a>
+    </div>
+
+    <div class="bottom p-3">
+      <a href="{{ url_for('logout') }}" class="btn btn-danger btn-sm w-100">Logout</a>
+    </div>
+  </div>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <h4>Doctor Dashboard</h4>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="active">
+      <h2 class="mb-4 fw-bold">Upcoming Appointments</h2>
+      {% if appointments %}
+        {% for app in appointments %}
+          <div class="card mb-3 p-3 bg-light text-dark rounded">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                <img src="{{ app.patient_photo or '/static/images/patient_default.jpg' }}" class="patient-thumb me-3" style="width:50px;height:50px;border-radius:50%;">
+                <div>
+                  <h5>{{ app.patient_name }}</h5>
+                  <p class="mb-0"><small>{{ app.date }} at {{ app.time }}</small></p>
+                </div>
+              </div>
+              <div>
+    {% if app.status == "Pending" %}
+        <form method="POST" action="{{ url_for('accept_appointment', appointment_id=app._id) }}" style="display:inline;">
+            <button class="btn btn-success btn-sm">Accept</button>
+        </form>
+
+        <form method="POST" action="{{ url_for('reject_appointment', appointment_id=app._id) }}" style="display:inline;">
+            <button class="btn btn-danger btn-sm">Reject</button>
+        </form>
+
+        <a href="{{ url_for('doctor_reschedule_appointment', appointment_id=app._id) }}" class="btn btn-warning btn-sm">
+            Reschedule
+        </a>
+    {% else %}
+        <span class="badge bg-primary">{{ app.status }}</span>
+    {% endif %}
+</div>
+
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-info">No upcoming appointments.</div>
+      {% endif %}
+    </section>
+
+    <!-- CALENDAR -->
+    <section id="calendar">
+      <h2 class="mb-3 fw-bold">📅 My Calendar</h2>
+      <div id="doctorCalendar"></div>
+    </section>
+
+    <!-- AVAILABILITY -->
+    <section id="availability">
+      <h2>➕ Add Availability Slots</h2>
+      <form method="POST" action="{{ url_for('doctor_add_availability') }}">
+        <div class="mb-3">
+          <label>Date</label>
+          <input type="date" class="form-control" name="date" required>
+        </div>
+        <div class="mb-3">
+          <label>Start Time</label>
+          <input type="time" class="form-control" name="start_time" required>
+        </div>
+        <div class="mb-3">
+          <label>End Time</label>
+          <input type="time" class="form-control" name="end_time" required>
+        </div>
+        <div class="mb-3">
+          <label>Notes</label>
+          <input type="text" class="form-control" name="notes" placeholder="Optional notes">
+        </div>
+        <button type="submit" class="btn btn-success">Add Slot</button>
+      </form>
+
+      <hr>
+
+      <h4>Existing Slots</h4>
+      {% if availability %}
+        <table class="table table-dark table-striped">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Start</th>
+              <th>End</th>
+              <th>Notes</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for slot in availability %}
+            <tr>
+              <td>{{ slot.date }}</td>
+              <td>{{ slot.start_time }}</td>
+              <td>{{ slot.end_time }}</td>
+              <td>{{ slot.notes }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('delete_availability', slot_id=slot._id) }}">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p>No availability slots yet.</p>
+      {% endif %}
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section id="notifications">
+      <h2>🔔 Notifications</h2>
+      <div class="alert alert-info">No notifications.</div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="profile">
+      <h2>⚙️ Edit Profile</h2>
+      <form method="POST" action="{{ url_for('doctor_edit_profile') }}" enctype="multipart/form-data"
+      class="bg-light text-dark p-4 rounded">
+
+    <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input type="text" name="name" class="form-control" value="{{ doctor.name }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Specialty</label>
+        <input type="text" name="specialty" class="form-control" value="{{ doctor.specialty }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-control" value="{{ doctor.email }}" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input type="text" name="phone" class="form-control" value="{{ doctor.phone }}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Profile Photo</label>
+        <input type="file" name="photo" class="form-control">
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update Profile</button>
+</form>
+
+    </section>
+
+  </div>
+</div>
+
+<script>
+let calendar;
+
+document.addEventListener("DOMContentLoaded", function () {
+  // Initialize FullCalendar
+  const calendarEl = document.getElementById("doctorCalendar");
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: "dayGridMonth",
+    height: "auto",
+    eventSources: [
+      { url: "/doctor/availability/json", color: "#28a745" },
+      { url: "/doctor/appointments/json" }
+    ]
+  });
+});
+
+const menuLinks = document.querySelectorAll(".sidebar .menu a");
+const sections = document.querySelectorAll(".main-content section");
+
+menuLinks.forEach(link => {
+  link.addEventListener("click", () => {
+    menuLinks.forEach(l => l.classList.remove("active"));
+    link.classList.add("active");
+
+    const target = link.getAttribute("data-section");
+    sections.forEach(sec => sec.classList.remove("active"));
+
+    if (target) {
+      const section = document.getElementById(target);
+      section.classList.add("active");
+
+      if (target === "calendar") {
+        setTimeout(() => { calendar.render(); calendar.updateSize(); }, 80);
+      }
+    }
+  });
+});
+</script>
+
+</body>
+</html>
